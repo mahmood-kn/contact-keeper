@@ -7,12 +7,19 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
+const auth = require('../middleware/auth');
 
 // @route     GET api/auth
 // @desc      Get the logged in user
 // @access    Private
-route.get('/', (req, res) => {
-  res.send('Get logged in');
+route.get('/', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    res.json(user);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Server Error');
+  }
 });
 
 // @route     POST api/auth
