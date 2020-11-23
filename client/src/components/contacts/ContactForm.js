@@ -42,6 +42,12 @@ const ContactForm = () => {
 
   const clearAll = () => {
     clearCurrent();
+    setContact({
+      name: '',
+      email: '',
+      phone: '',
+      type: 'personal',
+    });
   };
   return (
     <form className='card' onSubmit={onSubmit}>

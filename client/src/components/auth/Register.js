@@ -1,15 +1,32 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import AlertContext from '../../context/alert/alertContext';
+import AuthContext from '../../context/auth/authContext';
 
-const Register = () => {
+const Register = (props) => {
   const alertContext = useContext(AlertContext);
+  const authContext = useContext(AuthContext);
+
   const { setAlert } = alertContext;
+  const { register, error, clearError, isAuthenticated } = authContext;
+
   const [user, setUser] = useState({
     name: '',
     email: '',
     password: '',
     password2: '',
   });
+  const { name, email, password, password2 } = user;
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      props.history.push('/');
+    }
+    if (error === 'User already exists') {
+      setAlert(error, 'danger');
+      clearError();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error, isAuthenticated, props.history]);
 
   const onChange = (e) => setUser({ ...user, [e.target.name]: e.target.value });
 
@@ -20,11 +37,14 @@ const Register = () => {
     } else if (password !== password2) {
       setAlert('Password not match', 'danger');
     } else {
-      console.log('Register Submit');
+      register({
+        name,
+        email,
+        password,
+      });
     }
   };
 
-  const { name, email, password, password2 } = user;
   return (
     <div className='card form-container'>
       <form className='py-2' onSubmit={onSubmit}>

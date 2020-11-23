@@ -1,15 +1,30 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import AlertContext from '../../context/alert/alertContext';
+import AuthContext from '../../context/auth/authContext';
 
-const Login = () => {
+const Login = (props) => {
   const alertContext = useContext(AlertContext);
+  const authContext = useContext(AuthContext);
 
   const { setAlert } = alertContext;
+  const { login, error, clearError, isAuthenticated } = authContext;
 
   const [user, setUser] = useState({
     email: '',
     password: '',
   });
+  const { email, password } = user;
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      props.history.push('/');
+    }
+    if (error === 'Invalid Credential') {
+      setAlert(error, 'danger');
+      clearError();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error, isAuthenticated, props.history]);
 
   const onChange = (e) => setUser({ ...user, [e.target.name]: e.target.value });
 
@@ -18,11 +33,13 @@ const Login = () => {
     if (email === '' || password === '') {
       setAlert('Please fill the fields', 'danger');
     } else {
-      console.log('Login Submit');
+      login({
+        email,
+        password,
+      });
     }
   };
 
-  const { email, password } = user;
   return (
     <div className='card form-container'>
       <form className='py-2' onSubmit={onSubmit}>
